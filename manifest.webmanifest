@@ -1,0 +1,27 @@
+{
+ "name": "اليوسفليق ممكن يعيط",
+ "short_name": "اليوسفليق",
+ "description": "لعبة رعب: الشفت الليلي في محطة السامر، والجناح ب في المستشفى القديم.",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "orientation": "any",
+ "background_color": "#050608",
+ "theme_color": "#050608",
+ "lang": "ar",
+ "dir": "rtl",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
