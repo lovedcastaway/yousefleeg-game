@@ -1860,7 +1860,7 @@ function applySettings(){
   const q=QUALITY[SET.q]||QUALITY.mid;CONFIG.renderScale=q.scale;CONFIG.shadows=q.shadows;flash.castShadow=q.shadows;
   CONFIG.vhs=SET.vhs;
   if(SET.vhs&&!post)setupPost();
-  if(!SET.vhs&&post){post=null;['scan','vig'].forEach(id=>{const e=$(id);if(e)e.style.display='';});$('grain').style.opacity='';}
+  if(!SET.vhs){post=null;$('scan').style.display='none';$('vig').style.display='';$('grain').style.opacity='.035';}
   resize();
   reduced=SET.calm;
   document.documentElement.style.setProperty('--subScale',{s:'0.85',m:'1',l:'1.3'}[SET.sub]||'1');
