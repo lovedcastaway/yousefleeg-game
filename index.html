@@ -60,7 +60,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--body);overflow:hidde
 #prompt kbd{font-family:var(--hud);font-size:1.3em}
 #prompt kbd{font-family:inherit;color:var(--sodium)}
 #carry{position:absolute;right:30px;bottom:calc(30px + env(safe-area-inset-bottom,0px));font-family:var(--body);font-size:.66em;color:var(--dim)}
-#sub{position:absolute;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(680px,calc(100% - 32px));text-align:center;font-family:var(--body);font-size:clamp(16px,2vw,20px);line-height:1.7;text-shadow:0 1px 2px #000,0 0 8px #000}
+#sub{position:absolute;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(680px,calc(100% - 32px));text-align:center;font-family:var(--body);font-size:calc(clamp(16px,2vw,20px)*var(--subScale,1));line-height:1.7;text-shadow:0 1px 2px #000,0 0 8px #000}
 #sub b{display:block;font-family:var(--display);font-weight:400;font-size:1.1em;color:var(--sodium)}
 #sub.narr span{color:#bfc3b6}
 #sub .subnext{pointer-events:auto;display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-family:var(--body);font-weight:600;font-size:.8em;color:var(--sodium);background:rgba(5,6,8,.75);border:1px solid rgba(233,165,75,.55);padding:3px 14px;cursor:pointer;text-shadow:none}
@@ -202,6 +202,34 @@ label.btn{display:inline-block;font-size:19px;padding-block:10px}
 #keypad .keys button:focus-visible{outline:2px solid var(--sodium);outline-offset:2px}
 #kpHint{font-size:14px;color:var(--dim)}
 #camBtn{right:126px;bottom:calc(330px + env(safe-area-inset-bottom,0px));border-color:#9dff9a;color:#9dff9a}
+.btn.sm{font-size:18px;padding:6px 16px}
+.btn.danger{border-color:var(--rec);color:var(--rec)}
+.btn.danger:hover,.btn.danger:focus-visible{background:var(--rec);color:var(--bg)}
+.set{display:grid;gap:12px}
+.srow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;padding-bottom:12px;border-bottom:1px solid rgba(220,223,210,.12);font-family:var(--body);font-size:16px}
+.srow>span{display:grid;gap:2px}.srow small{font-size:12px;color:var(--dim)}
+.rng{display:flex;align-items:center;gap:10px}
+.rng input{width:min(180px,48vw);accent-color:var(--sodium)}
+.rng output{font-family:var(--hud);font-size:20px;min-width:3.2em;color:var(--sodium);direction:ltr;text-align:left}
+.seg{display:inline-flex;border:1px solid rgba(220,223,210,.35)}
+.seg button{font-family:var(--body);font-size:14px;font-weight:600;background:transparent;color:var(--dim);border:0;padding:7px 14px;cursor:pointer}
+.seg button+button{border-inline-start:1px solid rgba(220,223,210,.35)}
+.seg button:hover{color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--sodium);color:var(--bg)}
+.seg button:focus-visible{outline:2px solid var(--fg);outline-offset:-2px}
+#galCard>div{width:min(820px,100%)}
+.gal{display:grid;gap:22px}
+.gep h3{margin:0 0 10px;font-family:var(--display);font-weight:400;font-size:24px;display:flex;align-items:baseline;gap:10px}
+.gep h3 span{font-family:var(--hud);color:var(--sodium)}
+.gep h3 small{font-family:var(--body);font-size:13px;color:var(--dim)}
+.gtiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.gt{display:grid;gap:4px;align-content:start;background:rgba(5,6,8,.6);border:1px solid rgba(220,223,210,.2);border-inline-start:5px solid var(--sodium);padding:10px 12px}
+.gt .gn{font-family:var(--body);font-size:12px;color:var(--rec)}
+.gt b{font-family:var(--display);font-weight:400;font-size:20px;line-height:1.3}
+.gt small{font-family:var(--body);font-size:13px;line-height:1.7;color:#c9ccc0}
+.gt.no{border-inline-start-color:#444}.gt.no b{color:var(--dim);letter-spacing:.2em}.gt.no small{color:var(--dim)}
+.pbtns2{display:grid;gap:10px;justify-items:start}
+#pauseBtn{position:absolute;top:calc(132px + env(safe-area-inset-top,0px));left:24px;pointer-events:auto;width:48px;height:48px;border-radius:50%;background:rgba(5,6,8,.55);border:2px solid var(--fg);color:var(--fg);font-size:15px;font-family:var(--hud)}
 </style>
 </head>
 <body>
@@ -241,6 +269,7 @@ label.btn{display:inline-block;font-size:19px;padding-block:10px}
   <button id="breathBtn" class="tbtn" type="button" hidden>اكتم</button>
   <button id="crouchBtn" class="tbtn" type="button" hidden>انحني</button>
   <button id="camBtn" class="tbtn" type="button" hidden>كاميرا</button>
+  <button id="pauseBtn" type="button" aria-label="إيقاف مؤقت">❚❚</button>
 </div>
 
 <div class="fx" id="black"></div>
@@ -271,6 +300,7 @@ label.btn{display:inline-block;font-size:19px;padding-block:10px}
       <button class="ep" id="ep3Btn" type="button" aria-disabled="true"><span class="epn">03</span><b>السامر مول</b><small id="ep3Sub">مقفلة: خلّص أي نهاية في الحلقة 2</small></button>
     </div>
     <div class="fine" id="epLock" aria-live="polite"></div>
+    <div class="row"><button class="btn alt sm" id="galBtn" type="button">معرض النهايات</button><button class="btn alt sm" id="setBtn" type="button">الإعدادات</button></div>
     <div class="row" id="installRow" hidden><button class="btn alt" id="installBtn" type="button">ثبّت اللعبة على جهازك</button></div>
     <div class="fine" id="iosHint" hidden>للآيفون: اضغط «مشاركة» ثم «إضافة إلى الشاشة الرئيسية» عشان تثبّت اللعبة.</div>
     <div class="credit">صنع بواسطة <b>lovedcastaway</b> · الموسيقى: <b>tabletop</b></div>
@@ -290,6 +320,7 @@ label.btn{display:inline-block;font-size:19px;padding-block:10px}
       <kbd>F</kbd><span>الكشاف</span>
       <kbd>Space</kbd><span>اكتم نفسك (اضغط مطولاً وأنت متخبي)</span>
       <kbd>Enter</kbd><span>الحوار التالي (أو اضغط «التالي»)</span>
+      <kbd>Esc</kbd><span>إيقاف مؤقت (أو P)</span>
     </div>
     <div class="controls" id="ctrlTouch" hidden>
       <kbd>◀</kbd><span>الإبهام الأيسر: المشي (ادفع لآخر الدائرة للركض)</span>
@@ -315,6 +346,7 @@ label.btn{display:inline-block;font-size:19px;padding-block:10px}
       <kbd>E</kbd><span>استخدام / تخبّى في خزانة أو تحت سرير / اطلع</span>
       <kbd>Space</kbd><span>اكتم نفسك وأنت متخبي</span>
       <kbd>Enter</kbd><span>الحوار التالي</span>
+      <kbd>Esc</kbd><span>إيقاف مؤقت (أو P)</span>
     </div>
     <div class="controls" id="ctrlTouch2" hidden>
       <kbd>◀</kbd><span>الإبهام الأيسر: المشي (لآخر الدائرة للركض)</span>
@@ -340,6 +372,7 @@ label.btn{display:inline-block;font-size:19px;padding-block:10px}
       <kbd>C</kbd><span>انحني</span>
       <kbd>E</kbd><span>استخدام</span>
       <kbd>Enter</kbd><span>الحوار التالي</span>
+      <kbd>Esc</kbd><span>إيقاف مؤقت (أو P)</span>
     </div>
     <div class="controls" id="ctrlTouch3" hidden>
       <kbd>◀</kbd><span>الإبهام الأيسر: المشي (لآخر الدائرة للركض)</span>
@@ -349,6 +382,49 @@ label.btn{display:inline-block;font-size:19px;padding-block:10px}
     <div class="row"><button class="btn" id="startBtn3" type="button">ابدأ المناوبة</button><button class="btn alt" id="back3" type="button">رجوع للحلقات</button></div>
     <div class="fine">حوالي 15 دقيقة · 3 نهايات <span id="found3"></span></div>
     <div class="credit">صنع بواسطة <b>lovedcastaway</b> · الموسيقى: <b>tabletop</b></div>
+  </div>
+</section>
+
+<section class="card" id="setCard" hidden>
+  <div>
+    <div class="eyebrow"><i></i>إعدادات الشريط</div>
+    <h2>الإعدادات</h2>
+    <div class="set">
+      <div class="srow"><span>مستوى الصوت</span><div class="rng"><input type="range" id="setVol" min="0" max="100" step="5" aria-label="مستوى الصوت"><output id="setVolV"></output></div></div>
+      <div class="srow"><span>حساسية النظر<small>الماوس والسحب على الشاشة</small></span><div class="rng"><input type="range" id="setSens" min="40" max="250" step="10" aria-label="حساسية النظر"><output id="setSensV"></output></div></div>
+      <div class="srow"><span>جودة الرسوم<small>«منخفضة» أسرع على الجوالات الضعيفة</small></span><div class="seg" data-k="q" role="group"><button type="button" data-v="low">منخفضة</button><button type="button" data-v="mid">متوسطة</button><button type="button" data-v="high">عالية</button></div></div>
+      <div class="srow"><span>تأثير شريط الفيديو (VHS)</span><div class="seg" data-k="vhs" role="group"><button type="button" data-v="true">تشغيل</button><button type="button" data-v="false">إيقاف</button></div></div>
+      <div class="srow"><span>حجم الترجمة</span><div class="seg" data-k="sub" role="group"><button type="button" data-v="s">صغير</button><button type="button" data-v="m">عادي</button><button type="button" data-v="l">كبير</button></div></div>
+      <div class="srow"><span>تقليل الاهتزاز والوميض</span><div class="seg" data-k="calm" role="group"><button type="button" data-v="true">تشغيل</button><button type="button" data-v="false">إيقاف</button></div></div>
+    </div>
+    <div class="row"><button class="btn" id="setBack" type="button">رجوع</button><button class="btn alt sm" id="setDefaults" type="button">رجّع الافتراضي</button></div>
+    <div class="row"><button class="btn danger sm" id="setReset" type="button">امسح كل النهايات المكتشفة</button></div>
+    <div class="fine" id="setMsg" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="card" id="galCard" hidden>
+  <div>
+    <div class="eyebrow"><i></i>الأشرطة اللي لقيتها</div>
+    <h2>معرض النهايات</h2>
+    <div class="fine" id="galCount"></div>
+    <div id="galList" class="gal"></div>
+    <div class="row"><button class="btn" id="galBack" type="button">رجوع</button></div>
+  </div>
+</section>
+
+<section class="card" id="pauseCard" hidden>
+  <div>
+    <div class="eyebrow"><i></i>❚❚ PAUSE</div>
+    <h2>متوقف</h2>
+    <div class="fine" id="pauseEp"></div>
+    <div class="pbtns2">
+      <button class="btn" id="pResume" type="button">كمّل</button>
+      <button class="btn alt sm" id="pSettings" type="button">الإعدادات</button>
+      <button class="btn alt sm" id="pRestart" type="button">أعد الحلقة من البداية</button>
+      <button class="btn alt sm" id="pMenu" type="button">رجوع للحلقات</button>
+    </div>
+    <div class="fine">Esc أو P: إيقاف مؤقت / كمّل</div>
   </div>
 </section>
 
@@ -390,7 +466,7 @@ label.btn{display:inline-block;font-size:19px;padding-block:10px}
 (()=>{
 const $=id=>document.getElementById(id);
 const V=(x,y,z)=>new THREE.Vector3(x,y,z);
-const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isTouch=matchMedia('(pointer: coarse)').matches;
 /* ---------- SETTINGS: tweak the game here ---------- */
 const CONFIG={
@@ -682,7 +758,7 @@ const cust=makeFigure({body:0xd9d6cc,head:0x7a5a42,cap:0xb02a2a});
 let AC=null,master,humG,windG,nbuf;
 function audioInit(){if(AC)return;
   try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){AC=null;return;}
-  master=AC.createGain();master.gain.value=.7;master.connect(AC.destination);
+  master=AC.createGain();master.gain.value=.7*volMul();master.connect(AC.destination);
   nbuf=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=nbuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
   const o=AC.createOscillator();o.type='sawtooth';o.frequency.value=60;const o2=AC.createOscillator();o2.type='sine';o2.frequency.value=120;
   const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=240;humG=AC.createGain();humG.gain.value=.04;
@@ -696,7 +772,7 @@ function sting(){glitchAmt=Math.max(glitchAmt,0.85);shake=Math.max(shake,0.5);if
 function blip(f,d){if(!AC)return;const t=AC.currentTime;const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.05,t);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g).connect(master);o.start(t);o.stop(t+d+.02);}
 const step=()=>noise(.09,rnd(260,420),1.2,.22,'lowpass');
 let ringing=false,ringTimer=null;
-function ringOnce(){if(!AC)return;const t=AC.currentTime;[440,480].forEach(fq=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=fq;g.gain.setValueAtTime(0,t);for(let i=0;i<2;i++){const s=t+i*.45;g.gain.setValueAtTime(.05,s);g.gain.setValueAtTime(0,s+.35);}o.connect(g).connect(master);o.start(t);o.stop(t+1);});}
+function ringOnce(){if(!AC||paused)return;const t=AC.currentTime;[440,480].forEach(fq=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=fq;g.gain.setValueAtTime(0,t);for(let i=0;i<2;i++){const s=t+i*.45;g.gain.setValueAtTime(.05,s);g.gain.setValueAtTime(0,s+.35);}o.connect(g).connect(master);o.start(t);o.stop(t+1);});}
 function startRing(){ringing=true;ringOnce();ringTimer=setInterval(ringOnce,2600);}
 function stopRing(){const was=ringing;ringing=false;clearInterval(ringTimer);blip(300,.1);if(was){phoneHandset.visible=false;noise(.15,900,1,.2);}}
 
@@ -1148,7 +1224,7 @@ const enterEp2=()=>setEpisode(2),exitEp2=()=>setEpisode(1);
 function genStart(){if(!AC||genNodes)return;const o=AC.createOscillator(),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(18,AC.currentTime);o.frequency.linearRampToValueAtTime(46,AC.currentTime+2.5);
   f.type='lowpass';f.frequency.value=180;g.gain.setValueAtTime(0,AC.currentTime);g.gain.linearRampToValueAtTime(0.06,AC.currentTime+2);o.connect(f).connect(g).connect(master);o.start();genNodes={o,g};}
 function genStop(){if(!genNodes)return;const {o,g}=genNodes;genNodes=null;const t=AC.currentTime;g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(g.gain.value,t);g.gain.linearRampToValueAtTime(0,t+1.2);o.frequency.linearRampToValueAtTime(10,t+1.2);setTimeout(()=>{try{o.stop()}catch(e){}},1400);}
-function ringTone(){if(!AC)return;if(!ringBus){ringBus=AC.createGain();ringBus.gain.value=0;ringPan=AC.createStereoPanner?AC.createStereoPanner():null;if(ringPan){ringBus.connect(ringPan);ringPan.connect(master);}else ringBus.connect(master);}
+function ringTone(){if(!AC||paused)return;if(!ringBus){ringBus=AC.createGain();ringBus.gain.value=0;ringPan=AC.createStereoPanner?AC.createStereoPanner():null;if(ringPan){ringBus.connect(ringPan);ringPan.connect(master);}else ringBus.connect(master);}
   const t=AC.currentTime;[1320,1480].forEach((fq,k)=>{for(let i=0;i<4;i++){const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=fq;const s=t+i*0.18+k*0.09;
     g.gain.setValueAtTime(0,s);g.gain.setValueAtTime(.06,s+.005);g.gain.setValueAtTime(0,s+.08);o.connect(g).connect(ringBus);o.start(s);o.stop(s+.1);}});}
 function startPhoneRing(){E2.ringing=true;ringTone();ringTimer2=setInterval(ringTone,1800);}
@@ -1297,7 +1373,7 @@ function answerCall(){if(!callSt||callSt.on)return;callSt.on=true;clearInterval(
   const t0=performance.now();callClock=setInterval(()=>{const s=Math.floor((performance.now()-t0)/1000);$('callTimer').textContent=`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;},250);
   let src='';for(let i=Math.min(callSt.declines,2);i>=0&&!src;i--)if(CALL_AUDIOS[i].startsWith('data:'))src=CALL_AUDIOS[i];
   callSt.voice=callSt.declines+1;
-  if(src){callAudio=new Audio(src);callAudio.onended=endCall;callAudio.play().catch(()=>later(1500,endCall));}
+  if(src){callAudio=new Audio(src);callAudio.volume=Math.min(1,volMul());callAudio.onended=endCall;callAudio.play().catch(()=>later(1500,endCall));}
   else{noise(3,1200,.4,.05);later(3200,endCall);}}
 function declineCall(){if(!callSt)return;
   if(callSt.on){endCall();return;}
@@ -1478,7 +1554,7 @@ function rewSound(dur){if(!AC)return;const t=AC.currentTime,o=AC.createOscillato
   f.type='bandpass';f.frequency.value=900;f.Q.value=0.8;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.05,t+0.3);g.gain.setValueAtTime(0.05,t+dur-0.2);g.gain.linearRampToValueAtTime(0,t+dur);
   o.connect(f).connect(g).connect(master);o.start(t);o.stop(t+dur+0.1);noise(dur,3000,0.5,0.04);}
 function startBox(){E3.boxOn=true;if(!AC)return;const notes=[659,587,523,494,523,587,494,392,440,494,523,440];let i=0;
-  const play=()=>{if(!E3.boxOn)return;const t=AC.currentTime,d=Math.hypot(11.0-pos.x,7.4-pos.z),v=0.14/(1+d*d/30),f=notes[i%notes.length]*(1-Math.min(0.06,i*0.0025));i++;
+  const play=()=>{if(!E3.boxOn||paused)return;const t=AC.currentTime,d=Math.hypot(11.0-pos.x,7.4-pos.z),v=0.14/(1+d*d/30),f=notes[i%notes.length]*(1-Math.min(0.06,i*0.0025));i++;
     const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(0.0001,t+1.1);
     o.connect(g).connect(master);o.start(t);o.stop(t+1.2);};
   play();boxTimer=setInterval(play,560);}
@@ -1540,7 +1616,7 @@ function codeOk(){$('keypad').hidden=true;stage='busy';E3.doorOpen=true;fireCol.
 document.querySelectorAll('#keypad [data-k]').forEach(b=>b.addEventListener('click',()=>kpPress(b.dataset.k)));
 $('kpClose').onclick=closeKeypad;
 addEventListener('keydown',e=>{if($('keypad').hidden)return;const m=e.code.match(/^(?:Digit|Numpad)(\d)$/);
-  if(m){e.preventDefault();e.stopImmediatePropagation();kpPress(m[1]);}else if(e.code==='Backspace'){e.preventDefault();kpPress('del');}else if(e.code==='Escape')closeKeypad();},true);
+  if(m){e.preventDefault();e.stopImmediatePropagation();kpPress(m[1]);}else if(e.code==='Backspace'){e.preventDefault();kpPress('del');}else if(e.code==='Escape'){e.stopImmediatePropagation();closeKeypad();}},true);
 $('camBtn').addEventListener('click',()=>toggleCam());
 
 /* ---------- the stalker: invisible to the eye, frozen while the camcorder watches him ---------- */
@@ -1660,7 +1736,7 @@ const MENU_SONG_DATA='data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjY
 let menuNodes=[],menuG=null,menuEl=null,menuTimer=null;
 function startMenuMusic(){
   if(window.MENU_SONG||MENU_SONG_DATA){const a=new Audio(window.MENU_SONG?encodeURI(MENU_SONG):MENU_SONG_DATA);a.loop=true;a.volume=0;a.play().catch(()=>{});menuEl=a;
-    const t0=performance.now();const iv=setInterval(()=>{if(menuEl!==a){clearInterval(iv);return;}const k=Math.min(1,(performance.now()-t0)/4500);a.volume=0.8*k;if(k>=1)clearInterval(iv);},50);return;}
+    const t0=performance.now();const iv=setInterval(()=>{if(menuEl!==a){clearInterval(iv);return;}const k=Math.min(1,(performance.now()-t0)/4500);a.volume=Math.min(1,0.8*k*volMul());if(k>=1)clearInterval(iv);},50);return;}
   if(!AC)return;
   menuG=AC.createGain();menuG.gain.value=0;menuG.connect(master);const t=AC.currentTime;menuG.gain.setValueAtTime(0,t);menuG.gain.linearRampToValueAtTime(0.55,t+4.5);
   const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=600;lp.connect(menuG);
@@ -1725,7 +1801,7 @@ $('startBtn').onclick=()=>{audioInit();stopMenuMusic();$('title').hidden=true;$(
   playing=true;stage='clockin';obj('سجّل حضورك عند الكاشير.');lockPointer();
   say(['محطة السامر للوقود والتموينات. الشفت الليلي.']);};
 function lockPointer(){if(isTouch)return;try{const r=canvas.requestPointerLock&&canvas.requestPointerLock();if(r&&r.catch)r.catch(()=>{});}catch(e){}}
-function exitLock(){try{if(document.pointerLockElement&&document.exitPointerLock)document.exitPointerLock();}catch(e){}}
+function exitLock(){try{if(document.pointerLockElement&&document.exitPointerLock){lockIntent=true;document.exitPointerLock();}}catch(e){}}
 canvas.addEventListener('click',()=>{if(document.pointerLockElement===canvas){advanceSub();return;}if(playing&&!frozen)lockPointer();});
 
 /* ---------- input ---------- */
@@ -1741,14 +1817,14 @@ addEventListener('keydown',e=>{if(e.target&&(e.target.tagName==='INPUT'||e.targe
 addEventListener('keyup',e=>{keys[e.code]=false;});
 let drag=false;
 addEventListener('mousemove',e=>{if(!playing||frozen)return;
-  if(document.pointerLockElement===canvas||drag){yaw-=e.movementX*0.0022;pitch-=e.movementY*0.0022;pitch=Math.max(-1.3,Math.min(1.3,pitch));}});
+  if(document.pointerLockElement===canvas||drag){yaw-=e.movementX*0.0022*sensMul();pitch-=e.movementY*0.0022*sensMul();pitch=Math.max(-1.3,Math.min(1.3,pitch));}});
 canvas.addEventListener('mousedown',()=>{drag=true});addEventListener('mouseup',()=>{drag=false});
 const joy={x:0,y:0};let stickId=null,stickO=null,lookId=null,lookL=null;
 $('stickZone').addEventListener('touchstart',e=>{const t=e.changedTouches[0];stickId=t.identifier;stickO={x:t.clientX,y:t.clientY};e.preventDefault();},{passive:false});
 $('lookZone').addEventListener('touchstart',e=>{const t=e.changedTouches[0];lookId=t.identifier;lookL={x:t.clientX,y:t.clientY};e.preventDefault();},{passive:false});
 addEventListener('touchmove',e=>{for(const t of e.changedTouches){
   if(t.identifier===stickId){let dx=(t.clientX-stickO.x)/50,dy=(t.clientY-stickO.y)/50;const l=Math.hypot(dx,dy);if(l>1){dx/=l;dy/=l;}joy.x=dx;joy.y=dy;$('knob').style.transform=`translate(${dx*35}px,${dy*35}px)`;}
-  if(t.identifier===lookId&&playing&&!frozen){yaw-=(t.clientX-lookL.x)*0.006;pitch-=(t.clientY-lookL.y)*0.006;pitch=Math.max(-1.3,Math.min(1.3,pitch));lookL={x:t.clientX,y:t.clientY};}}},{passive:true});
+  if(t.identifier===lookId&&playing&&!frozen){yaw-=(t.clientX-lookL.x)*0.006*sensMul();pitch-=(t.clientY-lookL.y)*0.006*sensMul();pitch=Math.max(-1.3,Math.min(1.3,pitch));lookL={x:t.clientX,y:t.clientY};}}},{passive:true});
 addEventListener('touchend',e=>{for(const t of e.changedTouches){if(t.identifier===stickId){stickId=null;joy.x=joy.y=0;$('knob').style.transform='';}if(t.identifier===lookId)lookId=null;}});
 $('useBtn').addEventListener('click',()=>use());
 $('lightBtn').addEventListener('click',()=>toggleLight());
@@ -1768,6 +1844,100 @@ const inside=()=>EP!==1||(pos.x>-5.9&&pos.x<5.9&&pos.z>-4.9&&pos.z<4.9)||(pos.x>
 const gctx=$('grain').getContext('2d');const gimg=gctx.createImageData(160,90);
 function grain(){const d=gimg.data;for(let i=0;i<d.length;i+=4){const v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}gctx.putImageData(gimg,0,0);}
 
+/* ======================================================================
+   SETTINGS · ENDINGS GALLERY · PAUSE
+   ====================================================================== */
+const SET_DEF={vol:100,sens:100,q:'mid',vhs:true,sub:'m',calm:reduced};
+let SET=Object.assign({},SET_DEF);
+try{Object.assign(SET,JSON.parse(localStorage.getItem('yusf-settings')||'{}'));}catch(e){}
+const QUALITY={low:{scale:0.32,shadows:false},mid:{scale:0.45,shadows:true},high:{scale:0.62,shadows:true}};
+const volMul=()=>SET.vol/100,sensMul=()=>SET.sens/100;
+function saveSettings(){try{localStorage.setItem('yusf-settings',JSON.stringify(SET));}catch(e){}}
+function applySettings(){
+  if(master)master.gain.value=0.7*volMul();
+  if(menuEl)menuEl.volume=Math.min(1,0.8*volMul());
+  if(callAudio)callAudio.volume=Math.min(1,volMul());
+  const q=QUALITY[SET.q]||QUALITY.mid;CONFIG.renderScale=q.scale;CONFIG.shadows=q.shadows;flash.castShadow=q.shadows;
+  CONFIG.vhs=SET.vhs;
+  if(SET.vhs&&!post)setupPost();
+  if(!SET.vhs&&post){post=null;['scan','vig'].forEach(id=>{const e=$(id);if(e)e.style.display='';});$('grain').style.opacity='';}
+  resize();
+  reduced=SET.calm;
+  document.documentElement.style.setProperty('--subScale',{s:'0.85',m:'1',l:'1.3'}[SET.sub]||'1');
+  if(!post)canvas.style.filter=(EP===3&&E3.camOn)?'grayscale(1) sepia(1) hue-rotate(55deg) saturate(3) brightness(1.6)':'';}
+
+/* ---------- settings screen ---------- */
+let setFrom='menu',resetArm=false;
+function segSync(){document.querySelectorAll('#setCard .seg').forEach(g=>{const k=g.dataset.k;
+  g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===String(SET[k]))));});
+  $('setVol').value=SET.vol;$('setVolV').textContent=SET.vol+'%';$('setSens').value=SET.sens;$('setSensV').textContent=SET.sens+'%';}
+function openSettings(from){setFrom=from;resetArm=false;$('setReset').textContent='امسح كل النهايات المكتشفة';$('setMsg').textContent='';segSync();
+  (from==='pause'?$('pauseCard'):$('epCard')).hidden=true;$('setCard').hidden=false;$('setCard').scrollTop=0;$('setBack').focus({preventScroll:true});}
+function closeSettings(){$('setCard').hidden=true;if(setFrom==='pause'){$('pauseCard').hidden=false;$('pResume').focus();}else{showEpMenu(false);$('setBtn').focus();}}
+document.querySelectorAll('#setCard .seg button').forEach(b=>b.addEventListener('click',()=>{const k=b.parentElement.dataset.k;let v=b.dataset.v;
+  if(v==='true'||v==='false')v=v==='true';SET[k]=v;saveSettings();applySettings();segSync();blip(1100,.02);}));
+$('setVol').addEventListener('input',e=>{SET.vol=+e.target.value;saveSettings();applySettings();segSync();});
+$('setVol').addEventListener('change',()=>blip(900,.05));
+$('setSens').addEventListener('input',e=>{SET.sens=+e.target.value;saveSettings();segSync();});
+$('setReset').onclick=()=>{if(!resetArm){resetArm=true;$('setReset').textContent='متأكد؟ اضغط مرة ثانية للمسح';return;}
+  try{localStorage.removeItem('yusf-endings');}catch(e){}resetArm=false;$('setReset').textContent='امسح كل النهايات المكتشفة';$('setMsg').textContent='انمسح التقدّم. الحلقات 2 و3 رجعت مقفلة.';updateFoundLabels();noise(.3,300,1,.2);};
+$('setDefaults').onclick=()=>{const keepCalm=matchMedia('(prefers-reduced-motion: reduce)').matches;SET=Object.assign({},SET_DEF,{calm:keepCalm});saveSettings();applySettings();segSync();blip(900,.05);};
+$('setBack').onclick=closeSettings;
+$('setBtn').onclick=()=>openSettings('menu');
+
+/* ---------- endings gallery ---------- */
+const HINTS={caught:'أحيانًا ما فيه مكان تتخبى فيه... خلّه يلحقك.',counter:'فيه مكان تحت الكاشير يكفيك.',bathKey:'لو عطيت الزبون مفتاح الحمام... وبعدين تخبيت فيه؟',
+  bathMirror:'الحمام نفسه، بس لا تعطي أحد المفتاح.',h_caught:'الجناح ب ما يرحم اللي يمشي والكشاف شغّال.',h_escape:'بطاقة الدخول، الباب الرئيسي... ولا تبعد عن الباب.',
+  h_truth:'قبل لا تطلع، المشرحة فيها درج رقمه 7.',m_caught:'طفّ الكاميرا وخلّه يقرب.',m_escape:'ثلاث محلات، ثلاث أرقام، ومخرج طوارئ.',m_truth:'الخطوات اللي ما تشوفها إلا الكاميرا توديك لمكان... وانحني.'};
+const EP_NAMES={1:'محطة السامر',2:'الجناح ب',3:'السامر مول'};
+function renderGallery(){const f=getFound(),keys=Object.keys(ENDINGS),total=keys.length,got=keys.filter(k=>f.includes(k)).length;
+  $('galCount').textContent=`اكتشفت ${got} من ${total}`;
+  const open={1:true,2:keys.some(k=>ENDINGS[k].ep===1&&f.includes(k)),3:keys.some(k=>ENDINGS[k].ep===2&&f.includes(k))};
+  $('galList').innerHTML=[1,2,3].map(ep=>{const ks=keys.filter(k=>ENDINGS[k].ep===ep).sort((a,b)=>ENDINGS[a].n-ENDINGS[b].n),c=ks.filter(k=>f.includes(k)).length;
+    const tiles=ks.map(k=>{const e=ENDINGS[k];
+      if(f.includes(k))return `<div class="gt"><span class="gn">النهاية ${e.n}</span><b>${esc(e.title)}</b><small>${esc(nm(e.text))}</small></div>`;
+      return `<div class="gt no"><span class="gn">النهاية ${e.n}</span><b>؟؟؟</b><small>${open[ep]?'تلميح: '+esc(HINTS[k]||''):'الحلقة مقفلة'}</small></div>`;}).join('');
+    return `<section class="gep"><h3><span>0${ep}</span> ${esc(EP_NAMES[ep])} <small>${c} من ${ks.length}</small></h3><div class="gtiles">${tiles}</div></section>`;}).join('');}
+function openGallery(){renderGallery();$('epCard').hidden=true;$('galCard').hidden=false;$('galCard').scrollTop=0;$('galBack').focus({preventScroll:true});}
+function closeGallery(){$('galCard').hidden=true;showEpMenu(false);$('galBtn').focus();}
+$('galBtn').onclick=openGallery;$('galBack').onclick=closeGallery;
+
+/* ---------- pause ---------- */
+let paused=false,lockIntent=false;
+const canPause=()=>playing&&!frozen&&!paused&&stage!=='caught'&&$('end').hidden;
+function pauseGame(){if(!canPause())return;paused=true;frozen=true;
+  if(AC&&AC.state==='running')AC.suspend().catch(()=>{});try{if(carEl)carEl.pause();}catch(e){}
+  keys.Space=false;breathHeld=false;['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight'].forEach(k=>keys[k]=false);
+  joy.x=joy.y=0;
+  $('pauseEp').textContent=`الحلقة ${EP} · ${EP_NAMES[EP]}`;$('pauseCard').hidden=false;$('pResume').focus();exitLock();}
+function resumeGame(){if(!paused)return;$('pauseCard').hidden=true;$('setCard').hidden=true;paused=false;frozen=false;
+  if(AC&&AC.state==='suspended')AC.resume().catch(()=>{});try{if(carEl)carEl.play().catch(()=>{});}catch(e){}lockPointer();}
+function reloadTo(where){try{sessionStorage.setItem('yusf-go',where);}catch(e){}location.reload();}
+$('pResume').onclick=resumeGame;
+$('pSettings').onclick=()=>openSettings('pause');
+$('pRestart').onclick=()=>reloadTo('ep'+EP);
+$('pMenu').onclick=()=>reloadTo('menu');
+$('pauseBtn').addEventListener('click',e=>{e.stopPropagation();pauseGame();});
+document.addEventListener('pointerlockchange',()=>{const lost=document.pointerLockElement!==canvas;
+  if(lost&&!lockIntent&&canPause())pauseGame();if(lost)lockIntent=false;});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&canPause())pauseGame();});
+addEventListener('keydown',e=>{if(e.target&&(e.target.tagName==='INPUT'&&e.target.type!=='range'))return;
+  if(e.code!=='Escape'&&e.code!=='KeyP')return;if(e.repeat)return;
+  if(!$('setCard').hidden){e.preventDefault();e.stopImmediatePropagation();closeSettings();return;}
+  if(!$('galCard').hidden){e.preventDefault();e.stopImmediatePropagation();closeGallery();return;}
+  if(paused){e.preventDefault();e.stopImmediatePropagation();resumeGame();return;}
+  if(canPause()){e.preventDefault();e.stopImmediatePropagation();pauseGame();}},true);
+
+/* ---------- coming back from "restart" / "back to episodes" ---------- */
+(function(){let go=null,nm0=null;
+  try{go=sessionStorage.getItem('yusf-go');sessionStorage.removeItem('yusf-go');nm0=localStorage.getItem('yusf-name');}catch(e){}
+  if(!go||!nm0)return;
+  nameDone=true;PN=nm0;$('nameCard').hidden=true;$('who').textContent='بطاقة الموظف: '+nm0;showEpMenu(false);
+  const b={ep1:'ep1Btn',ep2:'ep2Btn',ep3:'ep3Btn'}[go];
+  if(b){$(b).click();if(!$('epCard').hidden)$('epLock').textContent='';}else $('ep1Btn').focus();
+  const kick=()=>{removeEventListener('pointerdown',kick,true);removeEventListener('keydown',kick,true);audioInit();applySettings();if(!$('epCard').hidden&&!menuEl)startMenuMusic();};
+  addEventListener('pointerdown',kick,true);addEventListener('keydown',kick,true);})();
+applySettings();
 /* ---------- loop ---------- */
 let last=performance.now(),stepAcc=0,bob=0,introT=0;
 const lerpA=(a,b,k)=>a+(b-a)*k;
@@ -1840,6 +2010,7 @@ function ep1Frame(dt,now){
 }
 function frame(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(paused){renderFrame(now);requestAnimationFrame(frame);return;}
   if(stage==='title'){introT+=dt;yaw=(EP===1?Math.PI:EP===2?-Math.PI/2:Math.PI/2)+Math.sin(introT*.15)*.25;pitch=-0.04;}
 
   // player movement, stamina, noise
